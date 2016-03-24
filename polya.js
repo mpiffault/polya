@@ -1,25 +1,27 @@
 'use strict';
 
-function polya(){
-    /*global console*/
-
+function polya() {
     var canvas = document.getElementById('myCanvas');
     var context = canvas.getContext('2d');
     var iterations = 1000;
+    var duration = 3000;
     var urn = ['#69D2E7','#A7DBD8','#E0E4CC', '#F38630','#FA6900'];
 
-    function drawWithReinforcement(urn) {
+    var startTime;
+    var lastTime = undefined;
+
+    var currentIteration = 0;
+
+    function drawWithReinforcement() {
         var randIndex = Math.floor(Math.random() * urn.length);
         urn.push(urn[randIndex]);
-        // We return a copy of the array
-        return urn.slice(0);
     }
 
     function countElementsInUrn(urn) {
         var countObject = {};
         urn.map(function (element) {
             var elementCount = countObject[element];
-           countObject[element] = elementCount === undefined ? 1 : elementCount + 1;
+            countObject[element] = elementCount === undefined ? 1 : elementCount + 1;
         });
         return countObject;
     }
@@ -34,7 +36,7 @@ function polya(){
         return nbDistinctElements;
     }
 
-    function drawGraphs(urn) {
+    function drawGraphs() {
         var result = countElementsInUrn(urn);
         context.clearRect(0, 0, canvas.width, canvas.height);
         var nbDistinctElements = countDistinctElementsInResult(result);
@@ -53,15 +55,33 @@ function polya(){
         }
     }
 
-    for (var i = 0 ; i < iterations ; i++) {
-        // We use global urn to make the draw
-        var localUrn = drawWithReinforcement(urn);
+    function step(timestamp) {
 
-        // We use the copy returned after draw to do the graphics
-        (function(localLocalUrn, i){
-            setTimeout(function(){drawGraphs(localLocalUrn);}, 5 * i);
-        })(localUrn, i);
+        if (!lastTime) {
+            lastTime = timestamp;
+            startTime = timestamp;
+        }
+
+        var enlapsedTime = timestamp - lastTime;
+        lastTime = timestamp;
+
+        var nbIterations = (enlapsedTime * iterations) / duration;
+
+        for (var i = 0 ; (currentIteration <= iterations) && (i < nbIterations) ; i++) {
+            drawWithReinforcement();
+            currentIteration++;
+        }
+
+        drawGraphs();
+        if (currentIteration < iterations) {
+            window.requestAnimationFrame(step)
+        } else {
+            console.log("Total enlapsed time = ", timestamp - startTime);
+            console.log("Last iteration = ", currentIteration);
+        }
     }
+
+    window.requestAnimationFrame(step);
 }
 
 document.getElementById('launch').onclick = polya;
