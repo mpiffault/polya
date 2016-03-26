@@ -5,7 +5,7 @@ function polya() {
     var context = canvas.getContext('2d');
     var iterations = 1000;
     var duration = 3000;
-    var urn = ['#69D2E7','#A7DBD8','#E0E4CC', '#F38630','#FA6900'];
+    var urn = ['#69D2E7','#A7DBD8','#E0E4CC', '#F38630','#FA6900','#AA2288'];
 
     var startTime;
     var lastTime = undefined;
