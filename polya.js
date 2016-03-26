@@ -9,6 +9,7 @@ function polya() {
 
     var startTime;
     var lastTime = undefined;
+    var epsilon = 0;
 
     var currentIteration = 0;
 
@@ -62,21 +63,24 @@ function polya() {
             startTime = timestamp;
         }
 
-        var enlapsedTime = timestamp - lastTime;
-        lastTime = timestamp;
+        var elapsedTime = timestamp - lastTime;
+        epsilon += elapsedTime % 1;
 
-        var nbIterations = (enlapsedTime * iterations) / duration;
+        var nbIterations = (elapsedTime * iterations) / duration;
 
-        for (var i = 0 ; (currentIteration <= iterations) && (i < nbIterations) ; i++) {
+        for (var i = 0 ; (currentIteration < iterations) && (i < nbIterations) ; i++) {
             drawWithReinforcement();
             currentIteration++;
         }
 
         drawGraphs();
+
+
+        lastTime = performance.now();
         if (currentIteration < iterations) {
             window.requestAnimationFrame(step)
         } else {
-            console.log("Total enlapsed time = ", timestamp - startTime);
+            console.log("Total elapsed time = ", (lastTime - startTime) + epsilon);
             console.log("Last iteration = ", currentIteration);
         }
     }
